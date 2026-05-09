@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+
+  pocketbase:
+    image: ghcr.io/muchobien/pocketbase:latest
+    container_name: reagent-pocketbase
+
+    restart: unless-stopped
+
+    ports:
+      - "8090:8090"
+
+    volumes:
+      - ./backend/pocketbase/pb_data:/pb/pb_data
+      - ./backend/pocketbase/pb_public:/pb/pb_public
+      - ./backend/pocketbase/pb_hooks:/pb/pb_hooks
+
+    environment:
+      TZ: America/Belem
+
+    command: >
+      sh -c "./pocketbase serve
+      --http=0.0.0.0:8090"
+
+  frontend:
+    image: node:22-alpine
+    container_name: reagent-frontend
+
+    working_dir: /app
+
+    restart: unless-stopped
+
+    ports:
+      - "5173:5173"
+
+    volumes:
+      - ./frontend:/app
+
+    command: >
+      sh -c "npm install &&
+      npm run dev -- --host"
+
+    depends_on:
+      - pocketbase
+
+    environment:
+      TZ: America/Belem
+      CHOKIDAR_USEPOLLING: "true"
+
+networks:
+  default:
+    name: reagent-network
