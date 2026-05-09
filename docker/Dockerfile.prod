@@ -1,0 +1,27 @@
+# ==========================================
+# ESTÁGIO 1: Build do Frontend (Vue.js/Vite)
+# ==========================================
+FROM node:22-alpine AS builder
+WORKDIR /app
+
+# Copia os arquivos do frontend e instala dependências
+COPY frontend/package*.json ./frontend/
+RUN cd frontend && npm install
+
+# Copia o código fonte e gera a versão de produção (dist)
+COPY frontend/ ./frontend/
+RUN cd frontend && npm run build
+
+# ==========================================
+# ESTÁGIO 2: PocketBase (Produção)
+# ==========================================
+FROM ghcr.io/muchobien/pocketbase:latest
+
+# Copia os hooks do backend (se houver regras de negócio lá)
+COPY backend/pocketbase/pb_hooks /pb/pb_hooks
+
+# Copia APENAS os arquivos estáticos compilados do Vue para a pasta pública do PocketBase
+COPY --from=builder /app/frontend/dist /pb/pb_public
+
+# Define o comando de inicialização
+CMD ["sh", "-c", "/pb/pocketbase serve --http=0.0.0.0:8090"]

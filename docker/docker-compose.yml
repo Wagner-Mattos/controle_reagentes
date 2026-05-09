@@ -12,9 +12,9 @@ services:
       - "8090:8090"
 
     volumes:
-      - ./backend/pocketbase/pb_data:/pb/pb_data
-      - ./backend/pocketbase/pb_public:/pb/pb_public
-      - ./backend/pocketbase/pb_hooks:/pb/pb_hooks
+      - ../backend/pocketbase/pb_data:/pb/pb_data
+      - ../backend/pocketbase/pb_public:/pb/pb_public
+      - ../backend/pocketbase/pb_hooks:/pb/pb_hooks
 
     environment:
       TZ: America/Belem
@@ -35,7 +35,8 @@ services:
       - "5173:5173"
 
     volumes:
-      - ./frontend:/app
+      - ../frontend:/app
+      - /app/node_modules
 
     command: >
       sh -c "npm install &&

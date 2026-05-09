@@ -1,0 +1,26 @@
+version: '3.9'
+
+services:
+  pocketbase-prod:
+    build:
+      context: .. # O contexto é a raiz do projeto para acessar backend e frontend
+      dockerfile: docker/Dockerfile.prod
+    
+    container_name: reagent-pocketbase-prod
+    restart: always # Em produção, queremos que reinicie automaticamente em caso de falha ou reboot
+
+    ports:
+      # Mapeamos a porta 80 do hospedeiro para a 8090 do PocketBase
+      # Assim o acesso no navegador não precisará do ":8090" na URL
+      - "80:8090"
+
+    volumes:
+      # Usa um volume do Docker em vez de uma pasta local para proteger os dados (SQLite)
+      - pb_data_prod:/pb/pb_data
+
+    environment:
+      TZ: America/Belem
+
+volumes:
+  pb_data_prod:
+    name: reagent-pb-data-prod
