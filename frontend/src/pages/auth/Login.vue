@@ -2,28 +2,27 @@
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
+import { toast } from 'vue3-toastify'
 
 const authStore = useAuthStore()
 const router = useRouter()
 const email = ref('')
 const password = ref('')
-const errorMsg = ref('')
 const isLoading = ref(false)
 
 const handleLogin = async () => {
   isLoading.value = true
-  errorMsg.value = ''
   
   try {
     // Tenta autenticar o usuário através da store do Pinia
     await authStore.login(email.value, password.value)
-    console.log('Autenticação realizada com sucesso!', authStore.user)
+    toast.success('Login realizado com sucesso!')
     
     router.push('/dashboard')
     
   } catch (err) {
     console.error('Erro de autenticação:', err)
-    errorMsg.value = 'Falha ao entrar. Verifique seu e-mail e senha e tente novamente.'
+    toast.error('Falha ao entrar. Verifique seu e-mail e senha e tente novamente.')
   } finally {
     isLoading.value = false
   }
@@ -57,10 +56,6 @@ const handleLogin = async () => {
             required
             placeholder="Sua senha"
           />
-        </div>
-        
-        <div v-if="errorMsg" class="error-msg">
-          {{ errorMsg }}
         </div>
         
         <button type="submit" :disabled="isLoading">
@@ -141,11 +136,5 @@ button:hover:not(:disabled) {
 button:disabled {
   background-color: #93c5fd;
   cursor: not-allowed;
-}
-.error-msg {
-  color: #ef4444;
-  font-size: 0.875rem;
-  margin-bottom: 1rem;
-  text-align: center;
 }
 </style>
