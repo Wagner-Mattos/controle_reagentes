@@ -1,8 +1,10 @@
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 
 const authStore = useAuthStore()
+const router = useRouter()
 const email = ref('')
 const password = ref('')
 const errorMsg = ref('')
@@ -17,8 +19,7 @@ const handleLogin = async () => {
     await authStore.login(email.value, password.value)
     console.log('Autenticação realizada com sucesso!', authStore.user)
     
-    // TODO: Redirecionar para o dashboard utilizando o Vue Router (ex: router.push('/dashboard'))
-    alert('Login realizado com sucesso!')
+    router.push('/dashboard')
     
   } catch (err) {
     console.error('Erro de autenticação:', err)

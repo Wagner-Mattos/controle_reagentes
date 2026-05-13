@@ -1,9 +1,7 @@
-<script setup>
-import Login from './pages/auth/Login.vue'
-</script>
+<script setup></script>
 
 <template>
   <main style="margin: 0; padding: 0;">
-    <Login />
+    <router-view />
   </main>
 </template>
