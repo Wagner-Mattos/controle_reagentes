@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 import Login from '../pages/auth/Login.vue'
 import Dashboard from '../pages/Dashboard.vue'
+import Reagentes from '../pages/Reagentes.vue'
+import Perfil from '../pages/Perfil.vue'
 import MainLayout from '../layouts/MainLayout.vue'
 
 const routes = [
@@ -21,6 +23,16 @@ const routes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: Dashboard,
+      },
+      {
+        path: 'reagentes',
+        name: 'Reagentes',
+        component: Reagentes,
+      },
+      {
+        path: 'perfil',
+        name: 'Perfil',
+        component: Perfil,
       },
       // Novas páginas como "Reagentes" entrarão aqui futuramente
     ]

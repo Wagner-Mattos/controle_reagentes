@@ -3,15 +3,16 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../../stores/auth'
 import { toast } from 'vue3-toastify'
+import { useUiStore } from '../../stores/ui'
 
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 const router = useRouter()
 const email = ref('')
 const password = ref('')
-const isLoading = ref(false)
 
 const handleLogin = async () => {
-  isLoading.value = true
+  uiStore.startLoading('Autenticando...')
   
   try {
     // Tenta autenticar o usuário através da store do Pinia
@@ -24,7 +25,7 @@ const handleLogin = async () => {
     console.error('Erro de autenticação:', err)
     toast.error('Falha ao entrar. Verifique seu e-mail e senha e tente novamente.')
   } finally {
-    isLoading.value = false
+    uiStore.stopLoading()
   }
 }
 </script>
@@ -58,8 +59,8 @@ const handleLogin = async () => {
           />
         </div>
         
-        <button type="submit" :disabled="isLoading">
-          {{ isLoading ? 'Entrando...' : 'Entrar' }}
+        <button type="submit" :disabled="uiStore.isLoading">
+          {{ uiStore.isLoading ? 'Entrando...' : 'Entrar' }}
         </button>
       </form>
     </div>
