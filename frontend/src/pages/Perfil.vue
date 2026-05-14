@@ -1,10 +1,12 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useAuthStore } from '../stores/auth'
+import { useUiStore } from '../stores/ui'
 import pb from '../services/pocketbase'
 import { toast } from 'vue3-toastify'
 
 const authStore = useAuthStore()
+const uiStore = useUiStore()
 
 const name = ref('')
 const username = ref('')
@@ -12,9 +14,20 @@ const email = ref('')
 const oldPassword = ref('')
 const newPassword = ref('')
 const newPasswordConfirm = ref('')
-const isLoading = ref(false)
 const avatarFile = ref(null)
 const avatarPreview = ref('')
+
+// Propriedade computada para exibir o cargo (role) traduzido e como somente leitura
+const roleDisplay = computed(() => {
+  const role = authStore.user?.role
+  const rolesMap = {
+    admin: 'Administrador',
+    supervisor: 'Supervisor',
+    technician: 'Técnico',
+    viewer: 'Somente Leitura (Visualizador)'
+  }
+  return rolesMap[role] || role || 'Não definido'
+})
 
 onMounted(() => {
   // Carrega os dados iniciais do usuário logado
@@ -38,18 +51,18 @@ const handleAvatarChange = (event) => {
 }
 
 const handleSave = async () => {
-  isLoading.value = true
+  uiStore.startLoading('Salvando perfil...')
   try {
     // Validação de senha local
     if (newPassword.value || oldPassword.value) {
       if (newPassword.value !== newPasswordConfirm.value) {
         toast.error('As novas senhas não coincidem.')
-        isLoading.value = false
+        uiStore.stopLoading()
         return
       }
       if (!oldPassword.value) {
         toast.error('A senha atual é obrigatória para alterar a senha.')
-        isLoading.value = false
+        uiStore.stopLoading()
         return
       }
     }
@@ -86,7 +99,7 @@ const handleSave = async () => {
     console.error('Erro ao atualizar perfil:', err)
     toast.error('Erro ao salvar as alterações.')
   } finally {
-    isLoading.value = false
+    uiStore.stopLoading()
   }
 }
 </script>
@@ -105,8 +118,9 @@ const handleSave = async () => {
             <div v-else class="avatar-placeholder">Sem Foto</div>
           </div>
           <div class="form-group avatar-input">
-            <label for="avatar">Foto de Perfil</label>
-            <input id="avatar" type="file" accept="image/*" @change="handleAvatarChange" />
+            <label for="avatar" class="btn-secondary">Escolher nova foto</label>
+            <input id="avatar" type="file" accept="image/*" @change="handleAvatarChange" class="hidden-input" />
+            <p class="help-text">Formatos suportados: JPG, PNG, GIF.</p>
           </div>
         </div>
 
@@ -116,13 +130,21 @@ const handleSave = async () => {
         </div>
         
         <div class="form-group">
+          <label for="role">Nível de Acesso (Perfil)</label>
+          <input id="role" type="text" :value="roleDisplay" disabled title="O nível de acesso só pode ser alterado por um Administrador" />
+        </div>
+        
+        <hr class="divider" />
+        <h3>Informações Pessoais</h3>
+
+        <div class="form-group">
           <label for="username">Nome de Usuário</label>
-          <input id="username" type="text" v-model="username" required />
+          <input id="username" type="text" v-model="username" required placeholder="Ex: joao.silva" />
         </div>
         
         <div class="form-group">
           <label for="name">Nome Completo</label>
-          <input id="name" type="text" v-model="name" />
+          <input id="name" type="text" v-model="name" placeholder="Ex: João da Silva" />
         </div>
         
         <hr class="divider" />
@@ -143,9 +165,11 @@ const handleSave = async () => {
           <input id="newPasswordConfirm" type="password" v-model="newPasswordConfirm" />
         </div>
         
-        <button type="submit" class="btn-primary" :disabled="isLoading">
-          {{ isLoading ? 'Salvando...' : 'Salvar Alterações' }}
-        </button>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary" :disabled="uiStore.isLoading">
+            {{ uiStore.isLoading ? 'Salvando...' : 'Salvar Alterações' }}
+          </button>
+        </div>
       </form>
     </div>
   </div>
@@ -182,6 +206,11 @@ input {
   border-radius: 6px;
   font-size: 1rem;
   box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.2s;
+}
+input:focus:not(:disabled) {
+  border-color: #3b82f6;
 }
 input:disabled {
   background-color: #f3f4f6;
@@ -247,7 +276,30 @@ h3 {
 .avatar-input {
   margin-bottom: 0;
 }
-.avatar-input input {
-  padding: 0.5rem;
+.hidden-input {
+  display: none;
+}
+.btn-secondary {
+  display: inline-block;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s, color 0.2s;
+}
+.btn-secondary:hover {
+  background-color: #e5e7eb;
+}
+.help-text {
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.5rem;
+  margin-bottom: 0;
+}
+.form-actions {
+  margin-top: 2rem;
 }
 </style>

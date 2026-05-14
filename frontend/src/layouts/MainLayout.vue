@@ -1,6 +1,8 @@
 <script setup>
+import { computed } from 'vue'
 import { RouterView, RouterLink, useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import pb from '../services/pocketbase'
 
 const router = useRouter()
 const authStore = useAuthStore()
@@ -9,6 +11,26 @@ const handleLogout = () => {
   authStore.logout()
   router.push('/login')
 }
+
+// Computa a URL do avatar. Atualiza automaticamente se o authStore mudar!
+const avatarUrl = computed(() => {
+  if (authStore.user && authStore.user.avatar) {
+    return pb.files.getUrl(authStore.user, authStore.user.avatar)
+  }
+  return ''
+})
+
+// Computa o cargo (role) traduzido para exibir na barra lateral
+const roleDisplay = computed(() => {
+  const role = authStore.user?.role
+  const rolesMap = {
+    admin: 'Administrador',
+    supervisor: 'Supervisor',
+    technician: 'Técnico',
+    viewer: 'Visualizador'
+  }
+  return rolesMap[role] || 'Não definido'
+})
 </script>
 
 <template>
@@ -26,6 +48,17 @@ const handleLogout = () => {
           </ul>
         </nav>
         <div class="sidebar-footer">
+          <div class="user-profile">
+            <img v-if="avatarUrl" :src="avatarUrl" alt="Avatar do usuário" class="avatar-img" />
+            <div v-else class="avatar-placeholder">
+              {{ authStore.user?.name?.charAt(0).toUpperCase() || authStore.user?.username?.charAt(0).toUpperCase() || 'U' }}
+            </div>
+            <div class="user-details">
+              <span class="user-name">{{ authStore.user?.name || authStore.user?.username || 'Usuário' }}</span>
+              <span class="user-role">{{ roleDisplay }}</span>
+            </div>
+          </div>
+          
           <RouterLink to="/perfil" class="profile-link">Minha Conta</RouterLink>
           <button @click="handleLogout" class="logout-btn">Sair</button>
         </div>
@@ -81,6 +114,45 @@ const handleLogout = () => {
 .sidebar a:hover, .sidebar a.router-link-active {
   background-color: #e5e7eb;
   font-weight: 500;
+}
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #d1d5db;
+}
+.avatar-img {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #d1d5db;
+}
+.avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: #3b82f6;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+}
+.user-name {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #374151;
+  line-height: 1.2;
+}
+.user-role {
+  display: block;
+  font-size: 0.75rem;
+  color: #6b7280;
+  margin-top: 0.125rem;
 }
 .profile-link {
   display: block;
