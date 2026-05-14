@@ -61,9 +61,14 @@ O Vite criará uma pasta chamada `dist/` contendo todos os arquivos estáticos e
 
 ## 4. Publicar no Servidor
 
-1. Acesse o seu servidor que hospeda `wiki.wagner.mattos.nom.br`.
-2. Copie **todo o conteúdo de dentro** da pasta `dist/` gerada no passo anterior.
-3. Cole os arquivos no diretório web raiz correspondente ao alias/pasta `/gestao/`.
+Para enviar os arquivos compilados para o servidor de produção, utilizaremos o `rsync`. Certifique-se de estar na pasta `frontend` do seu projeto local e execute o comando abaixo:
+
+```bash
+rsync -avz --delete --rsync-path="sudo rsync" dist/ dietpi@192.168.1.249:/var/www/html/gestao/
+```
+
+* **`dist/`**: Pasta local contendo o build final gerado pelo Vite.
+* **`--delete`**: Garante que arquivos antigos no servidor (como versões velhas de JS/CSS) sejam apagados, mantendo o diretório de destino exatamente igual à pasta local.
 
 ---
 

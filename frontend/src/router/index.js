@@ -1,10 +1,12 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
-import Login from '../pages/auth/Login.vue'
-import Dashboard from '../pages/Dashboard.vue'
-import Reagentes from '../pages/Reagentes.vue'
-import Perfil from '../pages/Perfil.vue'
-import MainLayout from '../layouts/MainLayout.vue'
+
+// Utilizando Lazy Loading para otimizar o bundle inicial
+const Login = () => import('../pages/auth/Login.vue')
+const Dashboard = () => import('../pages/Dashboard.vue')
+const Reagentes = () => import('../pages/Reagentes.vue')
+const Perfil = () => import('../pages/Perfil.vue')
+const MainLayout = () => import('../layouts/MainLayout.vue')
 
 const routes = [
   {

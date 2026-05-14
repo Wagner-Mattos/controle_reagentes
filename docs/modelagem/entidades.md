@@ -21,9 +21,8 @@ Representa um reagente químico controlado pelo sistema.
 
 - Controle de estoque
 - Controle de validade
-- Associação de localização
-- Associação de fornecedor
-- Controle documental
+- Registro de localização física (simplificado)
+- Registro de fabricante/fornecedor (simplificado)
 
 ---
 
@@ -38,6 +37,8 @@ Representa um reagente químico controlado pelo sistema.
 | unit | select |
 | expiration_date | date |
 | risk_class | select |
+| location | text |
+| manufacturer | text |
 
 ---
 
@@ -53,7 +54,6 @@ Registrar:
 - Saída
 - Ajuste
 - Descarte
-- Transferência
 
 ---
 
@@ -82,51 +82,8 @@ Representa usuários do sistema.
 ## Responsabilidades
 
 - Autenticação
-- Auditoria
 - Controle de acesso
-- Registro de ações
-
----
-
-# 📍 Location
-
-Representa localização física do reagente.
-
-## Estrutura
-
-| Campo |
-|---|
-| laboratory |
-| room |
-| cabinet |
-| shelf |
-| position |
-
----
-
-# 🏢 Supplier
-
-Representa fornecedores.
-
-## Objetivos
-
-- Controle de origem
-- Histórico de compras
-- Dados de contato
-
----
-
-# 🧾 Audit
-
-Registra eventos importantes do sistema.
-
-## Eventos previstos
-
-- Login
-- Logout
-- Alterações
-- Exclusões
-- Movimentações
+- Registro de autoria nas movimentações
 
 ---
 
@@ -137,9 +94,4 @@ User
  └── Movement
 
 Reagent
- ├── Movement
- ├── Supplier
- └── Location
-
-Audit
- └── User
+ └── Movement
